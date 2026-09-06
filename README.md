@@ -44,9 +44,25 @@ This repository documents the security engineering, threat modeling, and infrast
   * Validated automatic TLS upgrade and valid certificate chain via `curl -I`.
   * Verified that SQL injection and cross-site scripting payloads return `HTTP/2 403 Forbidden` at the proxy layer.
 
+### Milestone 3: Zero-Trust API Authentication & Identity Proxy
+* **Identified Vulnerabilities:**
+  * Application API endpoints exposed as open public utilities with zero client identity verification or authorization barriers.
+  * Anonymous internet traffic could read and manipulate stored journal entries without auditability.
+* **Remediations Applied:**
+  * Registered an Entra ID enterprise application (`learningsteps-oauth2-proxy-alex`) enforcing v2.0 token issuance and exposing the `access_as_user` delegated permission scope.
+  * Pre-authorized the Microsoft Azure CLI client ID (`04b07795-8ddb-461a-bbee-02f9e1bf7b46`) for headless token acquisition without interactive consent prompt failures.
+  * Deployed `oauth2-proxy` upstream on the VM listening on `127.0.0.1:4180`, integrating with Entra ID OpenID Connect discovery and bearer token validation.
+  * Configured Nginx `auth_request` subrequest routing in NPMplus (`npmplus_auth_request: oauth2proxy`) to gate all inbound requests at the reverse proxy.
+* **Verification:**
+  * Confirmed unauthenticated requests are intercepted and redirected (`HTTP/2 302 Found` to `/oauth2/sign_in`).
+  * Verified authenticated API queries presenting a valid Entra ID bearer token return `HTTP/2 200 OK` with JSON data.
+  * Confirmed defense-in-depth: authenticated requests containing exploit payloads (SQLi / XSS) are still caught and dropped with `HTTP/2 403 Forbidden` by CrowdSec AppSec.
+
 ---
 
 ### Upcoming Milestones
-- [ ] **Milestone 3: Zero-Trust API Authentication** (Identity proxy / OAuth2 enforcement).
+- [x] **Milestone 1: Management Plane & Identity Hardening**
+- [x] **Milestone 2: Ingress Security, TLS Termination & Edge WAF**
+- [x] **Milestone 3: Zero-Trust API Authentication** (Identity proxy / OAuth2 enforcement).
 - [ ] **Milestone 4: Database Isolation & Private Networking** (PostgreSQL VNet integration / Private Link).
 - [ ] **Milestone 5: Visibility & Threat Response** (Azure Monitor Agent, Syslog streaming, and Sentinel playbooks).
