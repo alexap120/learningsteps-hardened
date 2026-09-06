@@ -20,3 +20,14 @@ azssh_config
 az_ssh_config/
 
 *.sql
+
+# Sensitive deployment artifacts
+*.sql
+*.pem
+*.key
+azssh_config*
+az_ssh_config/
+terraform.tfvars
+.terraform/
+*.tfstate
+*.tfstate.*

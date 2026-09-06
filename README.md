@@ -70,12 +70,3 @@ This repository documents the security engineering, threat modeling, and infrast
 * **Verification:**
   * Confirmed port 5432 and hostname resolution fail from public networks (`Could not resolve hostname`).
   * Verified application service health via `HTTP/2 200 OK` on `/entries` returning restored seed records.
-
----
-
-### Upcoming Milestones
-- [x] **Milestone 1: Management Plane & Identity Hardening**
-- [x] **Milestone 2: Ingress Security, TLS Termination & Edge WAF**
-- [x] **Milestone 3: Zero-Trust API Authentication**
-- [x] **Milestone 4: Database Isolation & Private Networking**
-- [ ] **Milestone 5: Visibility & Threat Response** (Azure Monitor Agent, Syslog streaming, and Sentinel playbooks).
