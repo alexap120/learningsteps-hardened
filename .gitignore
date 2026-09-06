@@ -18,3 +18,5 @@ docs/
 
 azssh_config
 az_ssh_config/
+
+*.sql

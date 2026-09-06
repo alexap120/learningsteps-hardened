@@ -58,11 +58,24 @@ This repository documents the security engineering, threat modeling, and infrast
   * Verified authenticated API queries presenting a valid Entra ID bearer token return `HTTP/2 200 OK` with JSON data.
   * Confirmed defense-in-depth: authenticated requests containing exploit payloads (SQLi / XSS) are still caught and dropped with `HTTP/2 403 Forbidden` by CrowdSec AppSec.
 
+### Milestone 4: Database Isolation & Private Networking
+* **Identified Vulnerabilities:**
+  * PostgreSQL Flexible Server port 5432 exposed directly to `0.0.0.0/0` on the public internet.
+  * Application and database traffic routed across public IP space, susceptible to route hijacking and scanning.
+* **Remediations Applied:**
+  * Provisioned a dedicated delegated subnet (`snet-db`, `10.0.2.0/24`) with `Microsoft.DBforPostgreSQL/flexibleServers` delegation.
+  * Deployed an Azure Private DNS Zone (`privatelink.postgres.database.azure.com`) and linked it to `vnet-learningstepsalex`.
+  * Migrated the PostgreSQL Flexible Server to VNet integration (`public_network_access_enabled = false`), assigning it an internal private IP and removing the public endpoint.
+  * Executed a pre-migration logical backup (`pg_dump`) and restored data post-migration using the VM as an identity-authenticated bastion over Azure's private backbone.
+* **Verification:**
+  * Confirmed port 5432 and hostname resolution fail from public networks (`Could not resolve hostname`).
+  * Verified application service health via `HTTP/2 200 OK` on `/entries` returning restored seed records.
+
 ---
 
 ### Upcoming Milestones
 - [x] **Milestone 1: Management Plane & Identity Hardening**
 - [x] **Milestone 2: Ingress Security, TLS Termination & Edge WAF**
-- [x] **Milestone 3: Zero-Trust API Authentication** (Identity proxy / OAuth2 enforcement).
-- [ ] **Milestone 4: Database Isolation & Private Networking** (PostgreSQL VNet integration / Private Link).
+- [x] **Milestone 3: Zero-Trust API Authentication**
+- [x] **Milestone 4: Database Isolation & Private Networking**
 - [ ] **Milestone 5: Visibility & Threat Response** (Azure Monitor Agent, Syslog streaming, and Sentinel playbooks).
