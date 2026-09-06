@@ -30,10 +30,23 @@ This repository documents the security engineering, threat modeling, and infrast
 * **Verification:**
   * Validated zero-trust identity authentication using `az ssh vm --resource-group rg-learningstepsalex --name vm-learningstepsalex`.
 
+### Milestone 2: Ingress Security, TLS Termination & Edge WAF
+* **Identified Vulnerabilities:**
+  * Application lacked a managed ingress boundary, exposing backend ports directly.
+  * Risk of Adversary-in-the-Middle (AitM) interception over unencrypted HTTP.
+  * Uninspected application entry points exposed to web exploit payloads (SQLi, XSS, directory traversal).
+* **Remediations Applied:**
+  * Deployed an NPMplus container as an edge reverse proxy forwarding clean traffic to `127.0.0.1:8000`.
+  * Provisioned an automated, CA-signed Let's Encrypt TLS certificate for `learningstepsalex.westeurope.cloudapp.azure.com`.
+  * Enforced HTTP-to-HTTPS redirection (301), HSTS headers (max-age 2 years), and HTTP/2 transport.
+  * Integrated CrowdSec AppSec (running the OWASP Core Rule Set) as an active bouncer to drop malicious payloads at the perimeter.
+* **Verification:**
+  * Validated automatic TLS upgrade and valid certificate chain via `curl -I`.
+  * Verified that SQL injection and cross-site scripting payloads return `HTTP/2 403 Forbidden` at the proxy layer.
+
 ---
 
 ### Upcoming Milestones
-- [ ] **Milestone 2: Ingress Security & TLS Enforcement** (Reverse proxy, HTTPS/TLS 1.3 termination).
 - [ ] **Milestone 3: Zero-Trust API Authentication** (Identity proxy / OAuth2 enforcement).
 - [ ] **Milestone 4: Database Isolation & Private Networking** (PostgreSQL VNet integration / Private Link).
 - [ ] **Milestone 5: Visibility & Threat Response** (Azure Monitor Agent, Syslog streaming, and Sentinel playbooks).
